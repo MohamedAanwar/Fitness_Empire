@@ -9,12 +9,13 @@
     <link rel="shortcut icon" href="images/logo.png" type="image">
     <title>Admin login</title>
     <style>
-         @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 :root {
-    --primary-color:  hsl(180,12%,8%);
+    --primary-color: hsl(180,12%,8%);
     --secondary-color: red;
     --tertiary-color: #8b0000;
+    --light-color: #efefef;
     --gray-color: #b0b0b0;
 }
 
@@ -37,7 +38,7 @@
 .box {
     background-color: white;
     border-radius: 10px;
-    padding: 38px;
+    padding: 25px;
     width: 375px;
     max-width: 95%;
     box-shadow: 5px 5px 10px 1px rgb(0, 0, 0, 10%);
@@ -50,37 +51,26 @@
 }
 
 .box h1 {
-    font-size: 35px;
+    font-size: 25px;
     font-weight: 800;
     text-align: center;
-    margin-bottom: 45px;
-    color:  hsl(180,12%,8%);
+    margin-bottom: 35px;
+    color: hsl(180,12%,8%);
     font-family: 'Raleway';
-}
-
-.box form label {
-    display: block;
-    font-size: 12px;
-    margin-bottom: 3px;
 }
 
 .box form div {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--gray-color);
-}
-
-.box form div:hover {
-    border-bottom-color: var(--secondary-color);
-}
-
-.box form div:first-of-type {
-    margin-bottom: 35px;
+    background-color: var(--light-color);
+    border-radius: 250px;
+    margin-bottom: 25px;
+    padding: 10px;
 }
 
 .box form div i {
     font-size: 15px;
-    padding-left: 10px;
+    margin: 0 10px;
     color: var(--gray-color);
 }
 
@@ -89,10 +79,11 @@
 }
 
 .box form div input {
+    background-color: inherit;
     font-size: 12px;
     outline: none;
     border: none;
-    padding: 10px;
+    padding: 5px;
     min-width: 0;
     flex: 1;
 }
@@ -103,20 +94,11 @@
     font-size: 12px;
 }
 
-.box a {
+.box form div input[type="date"] {
     color: var(--gray-color);
-    text-decoration: none;
-    font-size: 12px;
-    display: block;
-}
-
-.box a:hover {
-    color: var(--secondary-color);
-}
-
-.box form .forgot {
-    margin-top: 15px;
-    float: right;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
 }
 
 .box form input[type="submit"] {
@@ -128,7 +110,6 @@
     border: none;
     width: 100%;
     padding: 15px;
-    margin-top: 45px;
     border-radius: 250px;
 }
 
@@ -137,10 +118,23 @@
     cursor: pointer;
 }
 
-.box .sign-up {
+.box span {
     margin-top: 25px;
+    font-size: 12px;
+    color: var(--gray-color);
+    display: block;
     text-align: center;
-    text-transform: uppercase;
+}
+
+.box span a {
+    font-weight: 500;
+    text-decoration: none;
+    color: #b0b0b0;
+    font-size: 15px;
+}
+
+.box span a:hover {
+    color: red;
 }
 .errorms{
     background:#F2DEDE;
@@ -150,7 +144,6 @@
     border-radius: 5px;
     margin: 20px auto;
     font-weight: 500;
-    text-align: justify;
     line-height: 18px;
 }
 .suc{
@@ -162,6 +155,7 @@
     margin: 20px auto;
     font-weight: 500;
 }
+
 .selectc{
     display: flex;
     justify-content: center;
@@ -178,20 +172,17 @@
     width: 100%;
     height: 25px;
     color: black;
-    background: white;
+   background: transparent;
     font-size: 17px;
     font-family: sans-serif;
     border-radius: 5px;
     font-weight: 400;
 }
-#g{
-    font-family: sans-serif;
-    font-weight: 500;
-    font-size: 17px;
-}
+
 #btn{
     cursor: pointer;
 }
+
     </style>
 </head>
 <body>
@@ -203,26 +194,21 @@ if(isset($_POST['submit'])){
 $program=$_POST['program'];
 $id=$_POST['id'];
 $code=$_POST['code'];
+$gmail=$_POST['gmail'];
 $s=[];
 $errors=[];
 
 $lowercase=preg_match('@[a-z]@',$code);
 $number=preg_match('@[0-9]@',$code);
 
-if(empty($id)&& empty($code)){
-    $errors[]="User ID and Code are Required";
-}
-elseif(empty($id)){
-    $errors[]="User ID is Required";
-}elseif(empty($code)){
-    $errors[]="Code is Required";
-}
-elseif(!$lowercase||!$number||strlen($code)<8   )
+
+
+if(!$lowercase||!$number||strlen($code)<8   )
 {
     $errors[]="Weak Code! Code should be at least 8 characters and should include numbers and letters";
 }
 
-if(!empty($id)&& !empty($code)){
+if(!empty($id)&& !empty($code) && !empty($gmail)){
 $stm="SELECT userid FROM users WHERE userid ='$id'";
    $q=$conn->prepare($stm);
    $q->execute();
@@ -233,41 +219,263 @@ $stm="SELECT userid FROM users WHERE userid ='$id'";
      $_POST['id']='';
    }
 }
+if(empty($errors)){
+    $stm="SELECT code FROM pplcode WHERE code ='$code'";
+   $q=$conn->prepare($stm);
+   $q->execute();
+   $data=$q->fetch();
+   
+   if($data){
+     $errors[]="Code is already use!";
+     $_POST['code']='';
+   }
 
+   
+}
+if(empty($errors)){
+    $stm="SELECT code FROM uplocode WHERE code ='$code'";
+   $q=$conn->prepare($stm);
+   $q->execute();
+   $data=$q->fetch();
+   
+   if($data){
+     $errors[]="Code is already use!";
+     $_POST['code']='';
+   }
 
-if($program=="Push-Pull-Leg")
+   
+}
+if(empty($errors)){
+    $stm="SELECT code FROM brosplitcode WHERE code ='$code'";
+   $q=$conn->prepare($stm);
+   $q->execute();
+   $data=$q->fetch();
+   
+   if($data){
+     $errors[]="Code is already use!";
+     $_POST['code']='';
+   }
+
+   
+}
+
+if($program=="premium")
 {
-
+    $startdate=date("Y/m/d");
+    $enddate=date("Y/m/d",strtotime($startdate."+3 month"));
     if(empty($errors)){
+
         
-        $stm="INSERT INTO pplcode (userid,code) VALUES ('$id','$code')";
+        $stm="INSERT INTO pplcode (userid,code,startdate,enddate) VALUES ('$id','$code','$startdate','$enddate')";
         $conn->prepare($stm)->execute();
         $_POST['code']='';
         
         $s[]="Code has been added successfully";
          }
-}elseif($program=="Upper-Lower"){
+         $stm="SELECT name FROM users WHERE userid ='$id'";
+         $q=$conn->prepare($stm);
+         $q->execute();
+         $data=$q->fetch();
+         $name=$data['name'];
+        //  mail
+        if(empty($errors)){
+            require_once 'mail.php';
+            $mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
+            $mail->addAddress($gmail);
+            $mail->Subject='FE - Premium code';
+            $mail->Body="<h3 style='color:red;'>Hello ".$name."!</h3>"."<h4>Thanks for getting started with our Fitness Empire Team!</h4>".
+            "_____________________________________________<br>".
+            "<table style=' border-collapse: collapse;
+           width: 100%;'>"
+           ."<caption><h3>FE - Premium code</h3></caption>"
+           ."<tr style='background-color: #f2f2f2;'>"
+           ."<th style='  text-align: left;padding: 8px;'>Code</th>"
+           ."<td style='  text-align: left;padding: 8px;'>".$code."</td>"
+           ."</tr >"
+           ."<tr>"
+           ."<th style='  text-align: left;padding: 8px;'>Subscription start date</th>"
+           ."<td style='  text-align: left;padding: 8px;'>".$startdate."</td>"
+           ."</tr>"
+           ."<tr style='background-color: #f2f2f2;'>"
+           ."<th style='  text-align: left;padding: 8px;'>Subscription end date</th>"
+           ."<td style='  text-align: left;padding: 8px;'>".$enddate."</td>"
+           ."</tr>"
+           ."<tr>"
+           ."<th style='  text-align: left;padding: 8px;'>No. of months</th>"
+           ."<td style='  text-align: left;padding: 8px;'>1 Month</td>"
+           ."</tr>"
+           ."</table>"
+          .
+            "_____________________________________________<br><br><b>HAVE QUESTIONS OR NEED HELP?</b><br><br>"."Let us know! We’ll do everything we can to make sure you love your experience with us. Reach us at empirefitness96@gmail.com or <a href='#'>01100106132</a>. We’re available all days.<br><br>"."<b><span style='color:red;'>Thank you,</span></b><br>Fitness Empire team";
+            $mail->send();
+            }
+}
+
+elseif($program=="basic"){
+    $startdate=date("Y/m/d");
+    $enddate=date("Y/m/d",strtotime($startdate."+1 month"));
     if(empty($errors)){
         // echo "insert db";
         
-        $stm="INSERT INTO uplocode (userid,code) VALUES ('$id','$code')";
+        $stm="INSERT INTO uplocode (userid,code,startdate,enddate) VALUES ('$id','$code','$startdate','$enddate')";
         $conn->prepare($stm)->execute();
         $_POST['code']='';
        
         
         $s[]="Code has been added successfully";
+        $stm="SELECT name FROM users WHERE userid ='$id'";
+        $q=$conn->prepare($stm);
+        $q->execute();
+        $data=$q->fetch();
+        $name=$data['name'];
+         //  mail
+          if(empty($errors)){
+             require_once 'mail.php';
+             $mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
+             $mail->addAddress($gmail);
+             $mail->Subject='FE - Basic code';
+             $mail->Body="<h3 style='color:red;'>Hello ".$name."!</h3>"."<h4>Thanks for getting started with our Fitness Empire Team!</h4>".
+             "_____________________________________________<br>".
+             "<table style=' border-collapse: collapse;
+            width: 100%;'>"
+            ."<caption><h3>FE - Basic code</h3></caption>"
+            ."<tr style='background-color: #f2f2f2;'>"
+            ."<th style='  text-align: left;padding: 8px;'>Code</th>"
+            ."<td style='  text-align: left;padding: 8px;'>".$code."</td>"
+            ."</tr >"
+            ."<tr>"
+            ."<th style='  text-align: left;padding: 8px;'>Subscription start date</th>"
+            ."<td style='  text-align: left;padding: 8px;'>".$startdate."</td>"
+            ."</tr>"
+            ."<tr style='background-color: #f2f2f2;'>"
+            ."<th style='  text-align: left;padding: 8px;'>Subscription end date</th>"
+            ."<td style='  text-align: left;padding: 8px;'>".$enddate."</td>"
+            ."</tr>"
+            ."<tr>"
+            ."<th style='  text-align: left;padding: 8px;'>No. of months</th>"
+            ."<td style='  text-align: left;padding: 8px;'>3 Months</td>"
+            ."</tr>"
+            ."</table>"
+           .
+             "_____________________________________________<br><br><b>HAVE QUESTIONS OR NEED HELP?</b><br><br>"."Let us know! We’ll do everything we can to make sure you love your experience with us. Reach us at empirefitness96@gmail.com or <a href='#'>01100106132</a>. We’re available all days.<br><br>"."<b><span style='color:red;'>Thank you,</span></b><br>Fitness Empire team";
+             $mail->send();
+          }
      }
-}elseif($program=="Brosplit"){
+   
+}
+
+elseif($program=="pro"){
+    $startdate=date("Y/m/d");
+    $enddate=date("Y/m/d",strtotime($startdate."+6 month"));
     if(empty($errors)){
         // echo "insert db";
         
-        $stm="INSERT INTO brosplitcode (userid,code) VALUES ('$id','$code')";
+        $stm="INSERT INTO brosplitcode (userid,code,startdate,enddate) VALUES ('$id','$code','$startdate','$enddate')";
+        $conn->prepare($stm)->execute();
+        
+        $_POST['code']='';
+       
+  
+        $s[]="Code has been added successfully";
+        $stm="SELECT name FROM users WHERE userid ='$id'";
+        $q=$conn->prepare($stm);
+        $q->execute();
+        $data=$q->fetch();
+        $name=$data['name'];
+         //  mail
+          if(empty($errors)){
+             require_once 'mail.php';
+             $mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
+             $mail->addAddress($gmail);
+             $mail->Subject='FE - Pro code';
+             $mail->Body="<h3 style='color:red;'>Hello ".$name."!</h3>"."<h4>Thanks for getting started with our Fitness Empire Team!</h4>".
+             "_____________________________________________<br>".
+             "<table style=' border-collapse: collapse;
+            width: 100%;'>"
+            ."<caption><h3>FE - Pro code</h3></caption>"
+            ."<tr style='background-color: #f2f2f2;'>"
+            ."<th style='  text-align: left;padding: 8px;'>Code</th>"
+            ."<td style='  text-align: left;padding: 8px;'>".$code."</td>"
+            ."</tr >"
+            ."<tr>"
+            ."<th style='  text-align: left;padding: 8px;'>Subscription start date</th>"
+            ."<td style='  text-align: left;padding: 8px;'>".$startdate."</td>"
+            ."</tr>"
+            ."<tr style='background-color: #f2f2f2;'>"
+            ."<th style='  text-align: left;padding: 8px;'>Subscription end date</th>"
+            ."<td style='  text-align: left;padding: 8px;'>".$enddate."</td>"
+            ."</tr>"
+            ."<tr>"
+            ."<th style='  text-align: left;padding: 8px;'>No. of months</th>"
+            ."<td style='  text-align: left;padding: 8px;'>6 Months</td>"
+            ."</tr>"
+            ."</table>"
+           .
+             "_____________________________________________<br><br><b>HAVE QUESTIONS OR NEED HELP?</b><br><br>"."Let us know! We’ll do everything we can to make sure you love your experience with us. Reach us at empirefitness96@gmail.com or <a href='#'>01100106132</a>. We’re available all days.<br><br>"."<b><span style='color:red;'>Thank you,</span></b><br>Fitness Empire team";
+             $mail->send();
+             }
+     }
+   
+
+}
+
+elseif($program=="platinum"){
+    $startdate=date("Y/m/d");
+    $enddate=date("Y/m/d",strtotime($startdate."+12 month"));
+    if(empty($errors)){
+        // echo "insert db";
+        
+        $stm="INSERT INTO brosplitcode (userid,code,startdate,enddate) VALUES ('$id','$code','$startdate','$enddate')";
+        $conn->prepare($stm)->execute();
+
+        $stm="INSERT INTO uplocode (userid,code,startdate,enddate) VALUES ('$id','$code','$startdate','$enddate')";
+        $conn->prepare($stm)->execute();
+
+        $stm="INSERT INTO pplcode (userid,code,startdate,enddate) VALUES ('$id','$code','$startdate','$enddate')";
         $conn->prepare($stm)->execute();
         $_POST['code']='';
        
   
         $s[]="Code has been added successfully";
+        $stm="SELECT name FROM users WHERE userid ='$id'";
+        $q=$conn->prepare($stm);
+        $q->execute();
+        $data=$q->fetch();
+        $name=$data['name'];
+          if(empty($errors)){
+             require_once 'mail.php';
+             $mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
+             $mail->addAddress($gmail);
+             $mail->Subject='FE - Platinum code';
+             $mail->Body="<h3 style='color:red;'>Hello ".$name."!</h3>"."<h4>Thanks for getting started with our Fitness Empire Team!</h4>".
+              "_____________________________________________<br>".
+              "<table style=' border-collapse: collapse;
+             width: 100%;'>"
+             ."<caption><h3>FE - Platinum code</h3></caption>"
+             ."<tr style='background-color: #f2f2f2;'>"
+             ."<th style='  text-align: left;padding: 8px;'>Code</th>"
+             ."<td style='  text-align: left;padding: 8px;'>".$code."</td>"
+             ."</tr >"
+             ."<tr>"
+             ."<th style='  text-align: left;padding: 8px;'>Subscription start date</th>"
+             ."<td style='  text-align: left;padding: 8px;'>".$startdate."</td>"
+             ."</tr>"
+             ."<tr style='background-color: #f2f2f2;'>"
+             ."<th style='  text-align: left;padding: 8px;'>Subscription end date</th>"
+             ."<td style='  text-align: left;padding: 8px;'>".$enddate."</td>"
+             ."</tr>"
+             ."<tr>"
+             ."<th style='  text-align: left;padding: 8px;'>No. of months</th>"
+             ."<td style='  text-align: left;padding: 8px;'>12 Months</td>"
+             ."</tr>"
+             ."</table>"
+            .
+              "_____________________________________________<br><br><b>HAVE QUESTIONS OR NEED HELP?</b><br><br>"."Let us know! We’ll do everything we can to make sure you love your experience with us. Reach us at empirefitness96@gmail.com or <a href='#'>01100106132</a>. We’re available all days.<br><br>"."<b><span style='color:red;'>Thank you,</span></b><br>Fitness Empire team";
+             $mail->send();
+             }
      }
+    
+   
 }
 
 }
@@ -295,30 +503,35 @@ if($program=="Push-Pull-Leg")
             }
         }
     ?>
-                <label for=""><b>Program</b></label>
+                
                 <div class="selectc">
                 <i class="fa-solid fa-list"></i>
                     <select class="selectb" name="program" id="">
-                        <option value="Push-Pull-Leg">Push-Pull-Leg</option>
-                        <option value="Upper-Lower">Upper-Lower</option>
-                        <option value="Brosplit">Brosplit</option>
+                        <option value="basic">Basic</option>
+                        <option value="premium">Premium</option>
+                        <option value="pro">Pro</option>
+                        <option value="platinum">Platinum</option>
                     </select>
                 </div>
-                <label><b>User ID</b></label>
+            
                 <div>
-                <i class="fa-solid fa-user"></i>
-                    <input type="number"   name="id" placeholder="Enter User ID" maxlength="8" minlength="8">
+                <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                    <input type="number"  id="a" name="id" placeholder="Enter User ID" maxlength="8" minlength="8" required>
                 </div>
-                <br><br>
-                <label><b>Code</b></label>
+                
+                <div>
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="a"  name="gmail" placeholder="Enter User Gmail" required >
+                </div>
+                
                 <div>
                 <i class="fa-solid fa-code"></i>
-                    <input type="text" id="g"  name="code" placeholder="Enter Code" >
+                    <input type="text" id="g"  name="code" placeholder="Enter Code" required>
                 </div>
-                <a id="btn" class="sign-up"><b>Generate Code</b></a>
+                <span><a id="btn" class="sign-up"><b>Generate Code</b></a></span> <br>
                 <input type="submit" name="submit" value="Add">
             </form>
-            <a href="index.php" class="sign-up"><b>HOME</b></a>
+           <span><a href="index.php" class="sign-up">HOME</a></span> 
      </div>
  </div>
 

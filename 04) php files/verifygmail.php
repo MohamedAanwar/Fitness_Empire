@@ -10,7 +10,7 @@ session_start();
     <link rel="stylesheet" href="css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="shortcut icon" href="images/logo.png" type="image">
-    <title>Forgot ID</title>
+    <title>Forgot Password</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
@@ -111,9 +111,8 @@ session_start();
     background-color: var(--secondary-color);
     color: white;
     border: none;
-    width: 49%;
+    width: 100%;
     padding: 15px;
-    margin-left: 76px;
     border-radius: 250px;
     margin-top: -12px;
 }
@@ -121,14 +120,15 @@ session_start();
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
-    background-color: var(--secondary-color);
-    color: white;
+    background-color: transparent;
+    color:var(--gray-color) ;
     border: none;
-    width: 49%;
-    padding: 15px;
-    margin-left: 76px;
+    width: 40%;
+    padding: 6px;
     border-radius: 250px;
-    margin-top: -12px;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: -6px;
 }
 
 .box form input[type="submit"]:hover {
@@ -236,75 +236,79 @@ session_start();
 </head>
 <body>
     <?php
+if(isset($_POST['sendcc']))
+{
+    include 'conn-db.php';
+    $gmail=filter_var($_POST['gmail'],FILTER_SANITIZE_EMAIL);
+    $vcode=filter_var($_POST['vcode'],FILTER_SANITIZE_STRING);
+    $errors=[];
+    $s=[];
+    if(empty($gmail))
+    {
+        $errors[]="Gmail is Required";
+    }
+    $stm="SELECT gmail FROM users WHERE gmail ='$gmail'";
+   $q=$conn->prepare($stm);
+   $q->execute();
+   $data=$q->fetch();
+   
+   if(!$data){
+     $errors[]="Gmail not found";
+     $_POST['gmail']='';
+   }
+   if(empty($errors))
+   {
+    $_SESSION['gmail']=$gmail;
+// genrate code
+$chars='0123456789';
+$charslen=strlen($chars);
+$randomcode='';
+for($i=0;$i<8;$i++)
+{
+    $randomcode .= $chars[rand(0,$charslen-1)];
+}
+$_SESSION['randomcode']=$randomcode;
+
+$stm="SELECT name FROM users WHERE gmail='$gmail'";
+$q=$conn->prepare($stm);
+$q->execute();
+$data=$q->fetch();
+$name=$data['name'];
+
+    require_once 'mail.php';
+$mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
+$mail->addAddress($gmail);
+$mail->Subject='Verification Code';
+$mail->Body="<h3 style='color:red;'>Hello ".$name."!</h3>"."<br>"."You recently requested to reset the password for your Fitness Empire account.<br><br>"."Your gmail verification code: " ."<a href='#'>" .$randomcode ."</a>"."<br><br>"."If you did not request a password reset, please ignore this email.<br><br>"."<b><span style='color:red;'>Thank you,</span></b><br>Fitness Empire team" ;
+$mail->send();
+
+ $s[]="Verification Code has been sent successfully";
+
+ 
+   }
+
+}
 
 if(isset($_POST['submit'])){
     include 'conn-db.php';
-       $gmail=filter_var($_POST['gmail'],FILTER_SANITIZE_STRING);
+       $gmail=filter_var($_POST['gmail'],FILTER_SANITIZE_EMAIL);
+       $vcode=filter_var($_POST['vcode'],FILTER_SANITIZE_STRING);
    $errors=[];
-
-$check=preg_match('@[a-z]@',$gmail);
+   $s=[];
+    
+   if(empty($vcode))
+{
+    $errors[]="Verification Code is Required";
+}
 
 if(empty($errors)){
     
-    if(!$check)
-    {
-        // phone
-        $stm="SELECT * FROM users WHERE phone ='$gmail' " ;
-        $q=$conn->prepare($stm);
-        $q->execute();
-        $data=$q->fetch();
-        if(!$data){
-           $errors[] = "Phone not found";
-           $_POST['gmail']="";
-        }
-        else{
-            require_once 'mail.php';
-$mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
-$mail->addAddress($data['gmail']);
-$mail->Subject='FE - Forgot ID';
-$mail->Body="<h1>Fitness Empire</h1>".
-"<table style=' border-collapse: collapse;
-width: 100%;'>"
-."<caption><h3>FE - Your ID</h3></caption>"
-."<tr style='background-color: #f2f2f2;'>"
-."<th style='  text-align: left;padding: 8px;'>ID</th>"
-."<td style='  text-align: left;padding: 8px;'>".$data['userid']."</td>"
-."</tr >"
-."</table>"
-."<br><br><b><span style='color:red;'>Thank you,</span></b><br>Fitness Empire team";
-$mail->send();
-echo "<script>"."alert('Your request has been successfully submitted! Check your gmail');window.location.href='login.php';"."</script>";
-
-        }
+    if($_SESSION['randomcode']!=$vcode){
+      $errors[]="Verification Code is not correct";
+      $_POST['vcode']='';
     }
     else{
-        // gmail
-         $stm="SELECT * FROM users WHERE gmail ='$gmail' " ;
-        $q=$conn->prepare($stm);
-        $q->execute();
-        $data=$q->fetch();
-        if(!$data){
-           $errors[] = "Gmail not found";
-           $_POST['gmail']="";
-        }
-        else{
-            require_once 'mail.php';
-            $mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
-            $mail->addAddress($gmail);
-            $mail->Subject='FE - Forgot ID';
-            $mail->Body="<h1>Fitness Empire</h1>".
-            "<table style=' border-collapse: collapse;
-            width: 100%;'>"
-            ."<caption><h3>FE - Your ID</h3></caption>"
-            ."<tr style='background-color: #f2f2f2;'>"
-            ."<th style='  text-align: left;padding: 8px;'>ID</th>"
-            ."<td style='  text-align: left;padding: 8px;'>".$data['userid']."</td>"
-            ."</tr >"
-            ."</table>"
-            ."<br><br><b><span style='color:red;'>Thank you,</span></b><br>Fitness Empire team";
-            $mail->send();
-            echo "<script>"."alert('Your request has been successfully submitted! Check your gmail');window.location.href='login.php';"."</script>";
-        }
+        header('location:changepass.php');
     }
 }
 }
@@ -313,8 +317,8 @@ echo "<script>"."alert('Your request has been successfully submitted! Check your
 ?>
 <div class="container">
         <div class="box">
-            <h1>Forgot ID</h1>
-            <form action="forgotid.php" method="POST" onsubmit="welcome()">
+            <h1>Verify Gmail</h1>
+            <form action="verifygmail.php" method="POST" onsubmit="welcome()">
             <?php 
         if(isset($errors)){
             if(!empty($errors)){
@@ -331,14 +335,21 @@ echo "<script>"."alert('Your request has been successfully submitted! Check your
             }
         }
     ?>
-                <br>
+                
                 <div>
                     <i class="fa-solid fa-envelope"></i>
-                    <input type="text" value="<?php if(isset($_POST['gmail'])){echo $_POST['gmail'];} ?>" name="gmail" placeholder="Enter Your Gmail/ Phone No." required>
+                    <input type="email" value="<?php if(isset($_POST['gmail'])){echo $_POST['gmail'];} ?>" name="gmail" placeholder="Enter Your Gmail" required>
                 </div>
-                <br><br>
-                <input type="submit" name="submit" value="Send ID" >
+                <div>
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="text" name="vcode" placeholder="Enter Gmail Verification Code">
+                </div>
+               <span id="send"> <input type="submit" name="sendcc" class="send" value="send Code"></span>
+             
+                <input type="submit" name="submit" value="Continue" >
             </form>
+            
+                <span><a href="login.php" class="send"><b>Login</b></a></span>
         </div>
     </div>
 

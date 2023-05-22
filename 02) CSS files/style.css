@@ -596,7 +596,7 @@ span{
 .contact .content form{
     margin: auto 0;
     width: 400px;
-    height: 550px;
+    height: 560px;
     padding: 20px;
     background: #fff;
     box-shadow: 0 10px 15px rgba(0,0,0,0.5);
@@ -1147,6 +1147,7 @@ span{
 }
 
 }
+
 /*  */
 .loader {
   position: fixed;

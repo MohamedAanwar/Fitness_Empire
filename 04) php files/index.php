@@ -12,6 +12,27 @@ session_start();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="shortcut icon" href="images/logo.png" type="image">
     <title>Fitness Empire</title>
+    <style>
+        .errorms{
+    background:#F2DEDE;
+    color: #A94442;
+    padding: 7px;
+    width: 95%;
+    border-radius: 5px;
+    margin: -1px auto;
+    font-weight: 500;
+    line-height: 18px;
+}
+.suc{
+    background:#d4edda;
+    color: #40754c;
+    padding: 7px;
+    width: 95%;
+    border-radius: 5px;
+    margin: -1px auto;
+    font-weight: 500;
+}
+    </style>
 </head>
 <body>
     
@@ -184,7 +205,7 @@ session_start();
                 <img src="images/p1.jpg" alt="Chest workout">
             </div>
             <div class="title">Push-Pull-Legs Split</div>
-            <a href="login.php" target="_blank">Join</a>
+            <a href="login.php" >Join</a>
             
         </div>
         <div class="frame">
@@ -192,14 +213,14 @@ session_start();
                 <img src="images/p2.jpg" alt="Back workout">
             </div>
             <div class="title">Upper and Lower</div>
-            <a href="uplologin.php" target="_blank">Join</a>
+            <a href="login.php" >Join</a>
         </div>
         <div class="frame">
             <div class="box">
                 <img src="images/p3.jpg" alt="Shoulder workout">
             </div>
             <div class="title">Bro Split</div>
-            <a href="brosplitlogin.php" target="_blank">Join</a>
+            <a href="login.php" >Join</a>
         </div>
         
     </div>
@@ -354,7 +375,7 @@ One cup of boiled chicken breast contains a whopping 39 grams of protein. That's
               <span>19</span>
             </div>
             <ul>
-              <li>3 Days in A Week</li>
+              <li>1 Month</li>
               <li>1 Sweatshirt</li>
               <li>1 Bottle of Protein</li>
               <li>Acess to UP-LO Program</li>
@@ -369,7 +390,7 @@ One cup of boiled chicken breast contains a whopping 39 grams of protein. That's
               <span>29</span>
             </div>
             <ul>
-                <li>4 Days in A Week</li>
+                <li>3 Months</li>
                 <li>2 Sweatshirt</li>
                 <li>2 Bottle of Protein</li>
                 <li>Acess to PPL Program</li>
@@ -384,7 +405,7 @@ One cup of boiled chicken breast contains a whopping 39 grams of protein. That's
               <span>39</span>
             </div>
             <ul>
-                <li>5 Days in A Week</li>
+                <li>6 Months</li>
                 <li>4 Sweatshirt</li>
                 <li>4 Bottle of Protein</li>
                 <li>Acess to Bro-split Program</li>
@@ -399,7 +420,7 @@ One cup of boiled chicken breast contains a whopping 39 grams of protein. That's
               <span>49</span>
             </div>
             <ul>
-                <li>6 Days in A Week</li>
+                <li>1 Year</li>
                 <li>6 Sweatshirt</li>
                 <li>6 Bottle of Protein</li>
                 <li>Acess to All Programs</li>
@@ -435,20 +456,145 @@ One cup of boiled chicken breast contains a whopping 39 grams of protein. That's
         
 
 </section>
+<?php
+if(isset($_POST['submit'])){
+    include 'conn-db.php';
+    $id=filter_var($_POST['id'],FILTER_SANITIZE_STRING); 
+   $name=filter_var($_POST['name'],FILTER_SANITIZE_STRING);
+   $gmail=filter_var($_POST['gmail'],FILTER_SANITIZE_EMAIL);
+   $message=$_POST['message'];
+   $errors=[];
+    $s=[];
+   $stm="SELECT userid FROM users WHERE userid ='$id'";
+   $q=$conn->prepare($stm);
+   $q->execute();
+   $data=$q->fetch();
+   
+   if(!$data){
+     $errors[]="ID not found!Please create an account";
+     $_POST['id']='';
+   }
 
+if(empty($errors)){
+$s[]="Message sent Successfully!";
+require_once 'mail.php';
+             $mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
+             $mail->addAddress('empirefitness96@gmail.com');
+             $mail->Subject='Contact - FE';
+             $mail->Body="<h1><span style='color:red;'>Fitness</span> Empire</h1><br>"
+             ."<table style=' border-collapse: collapse;
+             width: 100%;'>"
+             ."<caption><h3>FE - Customer message</h3></caption>"
+             ."<tr style='background-color: #f2f2f2;'>"
+             ."<th style='  text-align: left;padding: 8px;'>ID</th>"
+             ."<td style='  text-align: left;padding: 8px;'>".$id."</td>"
+             ."</tr >"
+             ."<tr>"
+             ."<th style='  text-align: left;padding: 8px;'>Name</th>"
+             ."<td style='  text-align: left;padding: 8px;'>".$name."</td>"
+             ."</tr>"
+             ."<tr style='background-color: #f2f2f2;'>"
+             ."<th style='  text-align: left;padding: 8px;'>Gmail</th>"
+             ."<td style='  text-align: left;padding: 8px;'>".$gmail."</td>"
+             ."</tr>"
+             ."<tr>"
+             ."<th style='  text-align: left;padding: 8px;'>Message</th>"
+             ."<td style='  text-align: left;padding: 8px;'>".$message."</td>"
+             ."</tr>"
+             ."</table>";
+             $mail->send();
+}
+if(empty($errors)){
+    require_once 'mail.php';
+             $mail->setFrom('empirefitness96@gmail.com','Fitness Empire');
+             $mail->addAddress($gmail);
+             $mail->Subject='FE - Message';
+             $mail->Body="<h3 style='color:red;'>Hello ".$name." !</h3> "
+             ."<h5>Thanks for getting started with our Fitness Empire Team!</h5><br>"
+             ."<h3>We will reply to you as soon as possible!</h3>"
+             ."________________<br><br>"
+             ."<table style=' border-collapse: collapse;
+             width: 100%;'>"
+             ."<caption><h3>FE - Pricing</h3></caption>"
+             ."<tr>"
+             ."<th style='  text-align: left;padding: 8px;'>BASIC</th>"
+             ."<th style='  text-align: left;padding: 8px;'>PREMIUM</th>"
+             ."<th style='  text-align: left;padding: 8px;'>PRO</th>"
+             ."<th style='  text-align: left;padding: 8px;'>PLATINUM</th>"
+             ."</tr>"
+             ."<tr style='background-color: #f2f2f2;'>"
+             ."<td style='  text-align: left;padding: 8px;'>19$</td>"
+             ."<td style='  text-align: left;padding: 8px;'>29$</td>"
+             ."<td style='  text-align: left;padding: 8px;'>39$</td>"
+             ."<td style='  text-align: left;padding: 8px;'>49$</td>"
+             ."</tr>"
+             ."<tr>"
+             ."<td style='  text-align: left;padding: 8px;'>1 Month</td>"
+             ."<td style='  text-align: left;padding: 8px;'>3 Months</td>"
+             ."<td style='  text-align: left;padding: 8px;'>6 Months</td>"
+             ."<td style='  text-align: left;padding: 8px;'>1 Year</td>"
+             ."</tr>"
+             ."<tr style='background-color: #f2f2f2;'>"
+             ."<td style='  text-align: left;padding: 8px;'>1 Sweatshirt</td>"
+             ."<td style='  text-align: left;padding: 8px;'>2 Sweatshirt</td>"
+             ."<td style='  text-align: left;padding: 8px;'>4 Sweatshirt</td>"
+             ."<td style='  text-align: left;padding: 8px;'>6 Sweatshirt</td>"
+             ."</tr>"
+             ."<tr>"
+             ."<td style='  text-align: left;padding: 8px;'>1 Bottle of Protein</td>"
+             ."<td style='  text-align: left;padding: 8px;'>2 Bottle of Protein</td>"
+             ."<td style='  text-align: left;padding: 8px;'>4 Bottle of Protein</td>"
+             ."<td style='  text-align: left;padding: 8px;'>6 Bottle of Protein</td>"
+             ."</tr>"
+             ."<tr style='background-color: #f2f2f2;'>"
+             ."<td style='  text-align: left;padding: 8px;'>Acess to UP-LO Program</td>"
+             ."<td style='  text-align: left;padding: 8px;'>Acess to PPL Program </td>"
+             ."<td style='  text-align: left;padding: 8px;'>Acess to Bro-split Program</td>"
+             ."<td style='  text-align: left;padding: 8px;'>Acess to All Programs</td>"
+             ."</tr>"
+             ."</table>"
+             ."________________<br><br>"
+             ."We Are Social:<br>"
+             ."<ul>"
+             ."<li>Facebook: <a href='https://m.facebook.com/groups/175196658685320/?ref=sharehttps://m.facebook.com/groups/175196658685320/?ref%3Dshare&exp=8ce3&mibextid=S66gvF'>Click here</a></li>"
+             ."<li>Whatsapp: <a href='https://chat.whatsapp.com/BbStoQejP4I1HDOodmW9lx'>Click here</a></li>"
+             ."<li>Instagram: <a href='https://instagram.com/fitness_empire_2023?igshid=YmMyMTA2M2Y='>Click here</a></li>"
+             ."<li>Gmail: <a href='empirefitness96@gmail.com'>Click here</a></li>"
+             ."</ul>"
+             ."<br><br><b><span style='color:red;'>Thank you,</span></b><br>Fitness Empire team";
+             $mail->send();
+}
+}
+?>
 <!-- contact section -->
-<section id="contact"class="contact view">
+<section id="contact"class="contact">
     <div class="main">
         <h2><span>C</span>ontact</h2>
         <h6>Can We Help You? Contact Us With Email!</h6><br>
         <div class="content">
-            <form onsubmit="contact(); reset(); return false" action="index.php" method="post">
-                <input type="number" id="id" placeholder="Your ID"  required title="Create email to get ID" maxlength="8" minlength="8">
-                <input type="text" id="name" placeholder="Your Name" required>
-                <input type="email" id="email" placeholder="Your Gmail" required>
-                <textarea rows="5"id="message" placeholder="How can we help you?" required></textarea>
+            <form  action="index.php#contact" method="post">
+            <?php 
+        if(isset($errors)){
+            if(!empty($errors)){
+                foreach($errors as $msg){
+                  ?> <p id="errorms" class="errorms"><?php echo $msg . "<br>";?></p><?php
+                }
+            }
+        } if(isset($s))
+        {
+            if(!empty($s)){
+                foreach($s as $msgg){
+                  ?> <p id="suc" class="suc"><?php echo $msgg . "<br>";?></p><?php
+                }
+            }
+        }
+        ?>
+                <input type="number" id="id" name="id" placeholder="Your ID"  required title="Create email to get ID" maxlength="8" minlength="8">
+                <input type="text" id="name" name="name" placeholder="Your Name" required>
+                <input type="email" id="email" name="gmail" placeholder="Your Gmail" required>
+                <textarea rows="5"id="message" name="message" placeholder="How can we help you?" required></textarea>
                 <br>
-               <input type="submit" value="Send" class="btn" name="submit">
+               <input type="submit"  value="Send" class="btn" name="submit">
             </form>
             <div class="bgimg"></div>
         </div>
@@ -469,7 +615,7 @@ One cup of boiled chicken breast contains a whopping 39 grams of protein. That's
 </section>
 
 <div class="loader"></div>
-<script src="https://smtpjs.com/v3/smtp.js"></script>
+
 
 <script src="jav.js"></script>
 </body>

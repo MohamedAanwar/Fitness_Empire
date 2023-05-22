@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 15, 2023 at 01:18 AM
+-- Generation Time: May 21, 2023 at 11:18 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -30,15 +30,10 @@ SET time_zone = "+00:00";
 CREATE TABLE `brosplitcode` (
   `id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
-  `code` varchar(255) NOT NULL
+  `code` varchar(255) NOT NULL,
+  `startdate` date NOT NULL,
+  `enddate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `brosplitcode`
---
-
-INSERT INTO `brosplitcode` (`id`, `userid`, `code`) VALUES
-(1, 12345678, '6t3zu5cx');
 
 -- --------------------------------------------------------
 
@@ -49,17 +44,10 @@ INSERT INTO `brosplitcode` (`id`, `userid`, `code`) VALUES
 CREATE TABLE `pplcode` (
   `id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
-  `code` varchar(255) NOT NULL
+  `code` varchar(255) NOT NULL,
+  `startdate` date NOT NULL,
+  `enddate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `pplcode`
---
-
-INSERT INTO `pplcode` (`id`, `userid`, `code`) VALUES
-(50, 12345678, '65kjd7yn'),
-(51, 12345678, 'dk3z1z52'),
-(52, 12345678, '74y04aub');
 
 -- --------------------------------------------------------
 
@@ -70,15 +58,10 @@ INSERT INTO `pplcode` (`id`, `userid`, `code`) VALUES
 CREATE TABLE `uplocode` (
   `id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
-  `code` varchar(255) NOT NULL
+  `code` varchar(255) NOT NULL,
+  `startdate` date NOT NULL,
+  `enddate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `uplocode`
---
-
-INSERT INTO `uplocode` (`id`, `userid`, `code`) VALUES
-(12, 12345678, '71706w8m');
 
 -- --------------------------------------------------------
 
@@ -91,18 +74,20 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `phone` int(11) NOT NULL,
-  `date` date NOT NULL
+  `gmail` varchar(255) NOT NULL,
+  `date` date DEFAULT NULL,
+  `gender` varchar(255) DEFAULT NULL,
+  `age` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`userid`, `name`, `password`, `phone`, `date`) VALUES
-(123456, 'mohamed', '$2y$10$XwVyimQDhDp1vRd9OkwCLuqTQiQGIRaYIF4fToYYzUb8z99hdCy0a', 1100106132, '2003-06-09'),
-(12345677, 'xxx', 'xxx', 1220918504, '2023-05-10'),
-(12345678, 'mohamed', '$2y$10$fWIg7xZz1SwPFwxNHjJ8KOBgnMU3QkN5u8NqN2PmIY0XUC5wKumJu', 1100106132, '2003-06-09'),
-(123456788, 'ddd', 'ddd', 1220918504, '2023-05-10');
+INSERT INTO `users` (`userid`, `name`, `password`, `phone`, `gmail`, `date`, `gender`, `age`) VALUES
+(30309020, 'Mohamed', '$2y$10$XCbTP7KJa0z1vS7v6dLZwuNkBhQsnNEgm/Kt8mRy5aBODh/F6aNxS', 1100103274, 'aahmedanwar1234@gmail.com', '2023-05-22', 'male', 0),
+(30309040, 'Mohamed', '$2y$10$Fox89YQr3Hm7Ad3hnHEQwu/HQioSJS8bRaarISFm.XQf8UgQWEqUO', 1100103285, 'mohamedanwarrr123@gmail.com', NULL, NULL, NULL),
+(30309060, 'omar', '$2y$10$NTYSQrgMwHMjm1THfbQP1.jstuC9eAyGgaHYsELYKSW3G0f0F/O9u', 1100106132, 'moahamedanwar082@gmail.com', NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -143,19 +128,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `brosplitcode`
 --
 ALTER TABLE `brosplitcode`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `pplcode`
 --
 ALTER TABLE `pplcode`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- AUTO_INCREMENT for table `uplocode`
 --
 ALTER TABLE `uplocode`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- Constraints for dumped tables
